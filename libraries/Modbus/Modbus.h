@@ -74,10 +74,13 @@ class Modbus {
         byte  _len;
         byte  _reply;
         void receivePDU(byte* frame);
+        unsigned long last_msg;
+        bool idle;
 
     public:
         Modbus();
 
+        bool isIdle(int max_idle);
         void addHreg(word offset, word value = 0);
         bool Hreg(word offset, word value);
         word Hreg(word offset);

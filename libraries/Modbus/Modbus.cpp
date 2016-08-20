@@ -62,6 +62,17 @@ word Modbus::Reg(word address) {
         return(0);
 }
 
+bool Modbus::isIdle(int max_idle){
+    if (this->idle)
+        return true;
+
+    if ( (millis() - this->last_msg) > max_idle ){
+        this->idle = true;
+        return true;
+    }
+    return false;
+}
+
 void Modbus::addHreg(word offset, word value) {
     this->addReg(offset + 40001, value);
 }
@@ -122,8 +133,9 @@ void Modbus::receivePDU(byte* frame) {
     word field1 = (word)frame[1] << 8 | (word)frame[2];
     word field2 = (word)frame[3] << 8 | (word)frame[4];
 
+    this->idle = false;
+    this->last_msg = micros();
     switch (fcode) {
-
         case MB_FC_WRITE_REG:
             //field1 = reg, field2 = value
             this->writeSingleRegister(field1, field2);
